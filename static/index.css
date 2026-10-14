@@ -268,22 +268,30 @@ img {
 
 /* The grid or row container holding your panels */
 /* 1. Update your existing container class */
-.poster-grid {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;    /* This forces items to drop to the next line instead of shrinking */
-  gap: 20px;          
-  padding: 20px;     
-  width: 90%;         /* Optional: Makes the container take up most of the page's space */
-  margin: 0 auto;     /* Optional: Centers the grid on the screen */
+.poster-grid { 
+  display: flex; 
+  justify-content: flex-start; /* Changed from center to keep items aligned to the left while scrolling */
+  flex-wrap: nowrap;           /* Prevents items from dropping to the next line */
+  overflow-x: auto;            /* Enables horizontal scrolling when content overflows */
+  scroll-behavior: smooth;     /* Optional: Makes scrolling smooth when triggered by code or anchors */
+  -webkit-overflow-scrolling: touch; /* Optional: Enables momentum scrolling on iOS devices */
+  
+  gap: 20px; 
+  padding: 20px; 
+  width: 90%; 
+  margin: 0 auto; 
 }
 
-/* 2. Target the clickable elements/posters inside the grid */
-.poster-grid > * {    /* Targets any immediate child (buttons, links, or divs) */
-  flex-shrink: 0;     /* This completely stops the elements from resizing */
-  width: 200px;       /* Set your specific poster width */
-  height: 300px;      /* Set your specific poster height */
+/* Optional: Ensures the child items inside the grid don't shrink */
+/* Replace .poster-panel with whatever class name your individual cards/panels use */
+.poster-grid > * {
+  flex-shrink: 0;   /* Keeps them from squishing */
+  width: 200px;     /* Control the exact width of your panels here */
+  height: 300px;    /* Control the exact height of your panels here */
+  object-fit: cover;/* If your panels are raw <img> tags, this prevents distortion */
 }
+
+
 
 /* 1. The Linked List Panel (The Interactive Element) */
 .poster-panel {

@@ -16,324 +16,74 @@ body {
   background-attachment: fixed; /* Keeps the image fixed in place */
 }
 
-article{
-  background-color: #0d1117d1;
-  border-radius: 50px;
+/* Container that allows horizontal scrolling */
+.poster-grid {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  padding: 20px;
+  scroll-behavior: smooth;
+  background-color: #111; /* Dark background for a movie feel */
 }
 
-div{
-  padding: 10px;
-}
-
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  background: linear-gradient(to bottom, #1a324d, #0d11175e);
-    color: #fff; /* Ensure text color contrasts well with background */
-  font-family: "Chiller", "Chiller Std", fantasy, cursive;
-  color: #48cd94;
-  margin-top: 24px;
-  margin-bottom: 16px;
-  text-align: center;
-  max-width: 300px;
-  margin-left: auto;
-  margin-right: auto;
-  border-radius: 10px;
-
-/*  text-shadow: 1px 1px 2px rgb(84, 166, 102), 0 0 5px rgb(63, 115, 86),
-    0 0 5px rgb(12, 12, 12); */
-}
-
-h1 {
-  h1 {
-  font-family: sans-serif;
-  color: #fff; /* White core text */
-  text-align: center;
-  font-size: 4rem;
-  
-  /* Stacking text-shadows (Horizontal, Vertical, Blur-radius, Color) */
-  text-shadow: 
-    0 0 5px #fff, 
-    0 0 10px #fff, 
-    0 0 20px #00ff00, 
-    0 0 40px #00ff00, 
-    0 0 80px #00ff00, 
-    0 0 120px #00ff00;
-}
-}
-
-h2 {
-  font-size: 1.5em;
-}
-
-h3 {
-  font-size: 1.17em;
-}
-
-h4,
-h5,
-h6 {
-  font-size: 1em;
-}
-
-a {
-  color: #58a6ff;
-  text-decoration: none;
+/* Individual card setup */
+.poster-panel {
   position: relative;
-  display: inline-block;
+  flex: 0 0 auto; /* Prevents posters from shrinking */
+  width: 200px;   /* Set your preferred poster width */
+  height: 300px;  /* Set your preferred poster height */
+  border-radius: 8px;
+  overflow: hidden;
+  display: block;
 }
 
-a::before {
-  /* on hover for links */
-  content: '';
-  position: absolute;
+/* Image formatting */
+.poster-panel img {
   width: 100%;
   height: 100%;
+  object-fit: cover;
+  transition: filter 0.3s ease;
+}
+
+/* Overlay for the movie title */
+.poster-title {
+  position: absolute;
   top: 0;
   left: 0;
-  background: #00080c;
-  z-index: -1;
-  transition: transform 0.3s ease;
-  transform: scaleX(0);
-  transform-origin: bottom right;
-  border-radius: 50px;
-}
-
-a:hover::before {
-  transform: scaleX(1);
-  transform-origin: bottom left;
-  border-radius: 50px;
-}
-
-ul,
-ol {
-  padding-left: 0px;
-  text-align: center;
-  list-style: none; /* Optional: removes bullet points */
-}
-
-
-.list {
-  list-style-type: none; /* Removes bullet points */
-  padding: 0;
-}
-.abbreviate {
-  white-space: nowrap; /* Prevents text from wrapping to the next line */
-  overflow: hidden; /* Hides the overflow text */
-  text-overflow: ellipsis; /* Adds '...' at the end of the text */
-}
-.scrollable {
-  max-width: 400px; /* Set the width of the block */
-  height: 375px; /* Set the height of the block */
-  overflow-x: hidden; /* Hide horizontal scrollbar */
-  overflow-y: auto; /* Enable vertical scrollbar */
-  overflow-wrap: break-word; /* Alternative to word-wrap for better compatibility */
-  scrollbar-color: #58a6ffb0 #48cd9338;
-}
-.single-scrollable {
-  max-width: 800px; /* Set the width of the block */
-  height: 300px; /* Set the height of the block */
-  overflow-x: hidden; /* Hide horizontal scrollbar */
-  overflow-y: auto; /* Enable vertical scrollbar */
-  overflow-wrap: break-word; /* Alternative to word-wrap for better compatibility */
-  margin-left: auto;
-  margin-right: auto;
-  scrollbar-color: #58a6ffb0 #48cd9338;
-}
-/* Navigation bar styling */
-.navbar {
-  overflow: hidden;
-}
-
-.navbar li {
-  float: left;
-  justify-content: center;
-}
-
-.navbar li a {
-  border-radius: 50px;
-  display: block;
-  max-height: 20px;
-  text-align: center;
-  padding: 10px 20px;
-  text-decoration: none;
-  width: 160px;
-  background-color: #48cd9332;
-  box-shadow: 0px 0px 15px #48cd934f, 0px 0px 15px #48cd934f inset;
-  border: 2px solid #48cd934f;
-}
-
-code {
-  background-color: #242424;
-  border-radius: 6px;
-  color: #d4ffa8;
-  padding: 0.2em 0.4em;
-  font-family: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
-}
-
-pre code {
-  padding: 0;
-}
-
-pre {
-  background-color: #242424a5;
-  border-radius: 14px;
-  white-space: pre-wrap; /* CSS3 */
-  white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
-  white-space: -pre-wrap; /* Opera 4-6 */
-  white-space: -o-pre-wrap; /* Opera 7 */
-  word-wrap: break-word; /* Internet Explorer 5.5+ */
-  font-size: 16px; /* You can adjust the size as needed */
-  color: #48cd93c8;
-  padding: 8px;
-}
-
-blockquote {
-  background-color: #242424;
-  border-left: 6px solid #30363d;
-  padding-left: 2em;
-  margin-left: 0;
-  padding-top: 0.5em;
-  padding-bottom: 0.5em;
-  padding-right: 0.5em;
-  color: #8b949e;
-}
-
-img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 6px;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  box-shadow: 0px 0px 15px #48cd934f, 0px 0px 15px #48cd934f inset;
-
-  border: 2px solid #48cd934f;
-}
-
-.center-container {
-  display: flex;
-  justify-content: center;
-}
-
-.link-list {
-  list-style-type: none;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  padding: 0;
-  justify-content: center;
-}
-
-.link-list li {
-  border: 0px solid #ccc;
-  padding: 0px;
-  width: 200px;
-  text-align: center;
-  font-family: 'Lucida Console', 'Lucida Sans Typewriter', Monaco,
-    'Bitstream Vera Sans Mono', monospace;
-  color: #58a6ff;
-
-  white-space: nowrap; /* Prevents text from wrapping to the next line */
-}
-
-.link-list a {
-  text-decoration: none;
-  color: inherit;
-}
-
-.link-list img {
-  height: auto;
-  aspect-ratio: 2/4;
-  object-fit: cover; /*
-  width: 280px;
-  border-radius: 50px;
-}
-.text-overlay {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: #58a6ff;
-  background-color: rgba(0, 0, 0, 0.315); /* Optional: Adds a semi-transparent background */
-  padding: 5px;
-  text-align: center;
-}
-
-
-
-/* The grid or row container holding your panels */
-/* 1. Update your existing container class */
-.poster-grid { 
-  display: flex; 
-  justify-content: flex-start; /* Changed from center to keep items aligned to the left while scrolling */
-  flex-wrap: nowrap;           /* Prevents items from dropping to the next line */
-  overflow-x: auto;            /* Enables horizontal scrolling when content overflows */
-  scroll-behavior: smooth;     /* Optional: Makes scrolling smooth when triggered by code or anchors */
-  -webkit-overflow-scrolling: touch; /* Optional: Enables momentum scrolling on iOS devices */
-  
-  gap: 20px; 
-  padding: 20px; 
-  width: 90%; 
-  margin: 0 auto; 
-}
-
-/* Optional: Ensures the child items inside the grid don't shrink */
-/* Replace .poster-panel with whatever class name your individual cards/panels use */
-.poster-grid > * {
-  flex-shrink: 0;   /* Keeps them from squishing */
-  width: 200px;     /* Control the exact width of your panels here */
-  height: 300px;    /* Control the exact height of your panels here */
-  object-fit: cover;/* If your panels are raw <img> tags, this prevents distortion */
-}
-
-
-
-/* 1. The Linked List Panel (The Interactive Element) */
-.poster-panel {
-  display: flex;
-  flex-direction: column;
-  width: 350px; /* Adjust based on your TV grid size */
-  text-decoration: none; /* Removes underline from title links */
-  color: #ffffff;
-  outline: none; /* Removes default browser outline to use custom focus */
-}
-
-/* 2. The Image Container enforcing the 2:3 Aspect Ratio */
-.poster-image {
-  aspect-ratio: 2 / 3;
   width: 100%;
-  height: auto;
-  object-fit: cover; 
-  border-radius: 8px; 
-  
-  /* Smooth transition when the parent link is focused */
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-}
-
-/* Optional: Text label inside the link */
-.poster-title {
-  margin-top: 10px;
-  font-size: 1.1rem;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7); /* Darkens the background */
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   text-align: center;
-  opacity: 0.8;
-}
-
-/* 3. TV Focus State (Triggered when the <a> tag gets focus via D-pad) */
-.poster-panel:focus .poster-image,
-.poster-panel:hover .poster-image {
-  transform: scale(1.08);
-  box-shadow: 0 0 0 4px #ffffff, 0 12px 24px rgba(0, 0, 0, 0.6);
-}
-
-.poster-panel:focus .poster-title {
-  opacity: 1;
+  padding: 10px;
+  font-family: sans-serif;
+  font-size: 1.2rem;
   font-weight: bold;
+  text-decoration: none;
+  
+  /* Hidden by default */
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
+/* Hover Effects */
+.poster-card:hover img {
+  filter: brightness(0.5); /* Alternative way to darken the image */
+}
 
+.poster-card:hover .poster-title {
+  opacity: 1; /* Shows the title on hover */
+}
+
+/* Optional: Hide scrollbar for a cleaner look (WebKit browsers) */
+.poster-scroll-container::-webkit-scrollbar {
+  height: 8px;
+}
+.poster-scroll-container::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 4px;
+}
 

@@ -16,10 +16,40 @@ body {
   background-attachment: fixed; /* Keeps the image fixed in place */
 }
 
-article{
-  background-color: #0d1117d1;
-  border-radius: 50px;
+
+.player-container {
+    background-color: #1e1e1e;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    width: 100%;
+    max-width: 400px;
 }
+
+h1 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.track-card {
+    background-color: #282828;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.track-title {
+    margin: 0 0 10px 0;
+    font-weight: bold;
+}
+
+audio {
+    width: 100%;
+    outline: none;
+}
+
+
 
 div{
   padding: 10px;
@@ -72,6 +102,9 @@ h2 {
 
 h3 {
   font-size: 1.17em;
+  background-color: #000000; /* Black background */
+  color: #ff66cc;            /* Pink text letters */
+  display: inline-block;     /* Keeps the black background hugging the text tightly */
 }
 
 h4,
@@ -155,14 +188,14 @@ ol {
 }
 
 .navbar li a {
-  border-radius: 50px;
+  border-radius: 20px;
   display: block;
   max-height: 20px;
   text-align: center;
   padding: 10px 20px;
   text-decoration: none;
   width: 160px;
-  background-color: #48cd9332;
+  background-color: #ffffff;
   box-shadow: 0px 0px 15px #48cd934f, 0px 0px 15px #48cd934f inset;
   border: 2px solid #48cd934f;
 }

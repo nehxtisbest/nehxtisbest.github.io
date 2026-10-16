@@ -87,3 +87,36 @@ body {
   border-radius: 4px;
 }
 
+.player-container {
+    background-color: #1e1e1e;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    width: 100%;
+    max-width: 400px;
+}
+
+h1 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.track-card {
+    background-color: #282828;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.track-title {
+    margin: 0 0 10px 0;
+    font-weight: bold;
+}
+
+audio {
+    width: 100%;
+    outline: none;
+}
+
+

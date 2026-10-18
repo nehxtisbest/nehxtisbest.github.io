@@ -8,11 +8,13 @@ def main():
 
     with open('songlist.txt', "r", encoding="utf-8") as f:                                                           songlist = f.read()
 
+    answer = input(f"are you sure you want to..\ncreate {html_file}\nmove {soundfile} to static/images/posters\nupdate all songlists(y): ")
 
-    create_html_file(html_file)
-    move_sound_file(soundfile)
-    write_to_html(html_file, song_name, soundfile, songlist)
-    update_songlists(html_file, song_name, songlist)
+    if answer == "y":
+        create_html_file(html_file)
+        move_sound_file(soundfile)
+        write_to_html(html_file, song_name, soundfile, songlist)
+        update_songlists(html_file, song_name, songlist)
 
 
 

@@ -306,6 +306,8 @@ img {
   justify-content: flex-start; /* Changed from center to keep items aligned to the left while scrolling */
   flex-wrap: nowrap;           /* Prevents items from dropping to the next line */
   overflow-x: auto;            /* Enables horizontal scrolling when content overflows */
+  overflow-y: hidden;            /* Enables horizontal scrolling when content overflows */
+  height: 400px;
   scroll-behavior: smooth;     /* Optional: Makes scrolling smooth when triggered by code or anchors */
   -webkit-overflow-scrolling: touch; /* Optional: Enables momentum scrolling on iOS devices */
   

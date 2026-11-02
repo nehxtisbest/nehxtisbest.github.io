@@ -9,9 +9,43 @@
         body, html { width: 100%; height: 100%; overflow: hidden; background: linear-gradient(to bottom, #064e3b, #022c22); font-family: system-ui, sans-serif; user-select: none; touch-action: none; }
         canvas { display: block; width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
         .ui-overlay { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); color: #a7f3d0; text-align: center; pointer-events: none; font-weight: bold; font-size: 16px; text-shadow: 0 2px 4px rgba(0,0,0,0.6); z-index: 10; }
+        
+        /* Home Button Styles */
+        .home-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 20;
+            background-color: rgba(16, 185, 129, 0.2);
+            color: #a7f3d0;
+            border: 2px solid #10b981;
+            padding: 10px 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(4px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        }
+        .home-btn:hover {
+            background-color: #10b981;
+            color: #022c22;
+            transform: scale(1.05);
+        }
+        .home-btn:active {
+            transform: scale(0.95);
+        }
     </style>
 </head>
 <body>
+
+    <!-- Clickable Home Button -->
+    <a href="index.html" class="home-btn">🏠 Home</a>
 
     <div class="ui-overlay">Click or Tap to Drop Bananas! 🍌🐒</div>
     <canvas id="jungleSandbox"></canvas>
@@ -99,7 +133,11 @@
             }
         }
 
-        function triggerSpawn(x, y) { bananas.push(new Banana(x, y)); }
+        function triggerSpawn(x, y) { 
+            // Prevent spawning bananas if the user clicks the home button area
+            if (x < 120 && y < 70) return;
+            bananas.push(new Banana(x, y)); 
+        }
 
         monkeys.push(new Monkey(window.innerWidth * 0.25, window.innerHeight * 0.60, 18));
         monkeys.push(new Monkey(window.innerWidth * 0.50, window.innerHeight * 0.65, 22));

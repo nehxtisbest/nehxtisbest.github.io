@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colorful Monkey Swing Sandbox</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, html { width: 100%; height: 100%; overflow: hidden; background: linear-gradient(to bottom, #064e3b, #022c22); font-family: system-ui, sans-serif; user-select: none; touch-action: none; }
+        canvas { display: block; width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
+        .ui-overlay { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); color: #a7f3d0; text-align: center; pointer-events: none; font-weight: bold; font-size: 16px; text-shadow: 0 2px 4px rgba(0,0,0,0.6); z-index: 10; }
+    </style>
+</head>
+<body>
+
+    <div class="ui-overlay">Click or Tap to Drop Bananas! 🍌🐒</div>
+    <canvas id="jungleSandbox"></canvas>
+
+    <script>
+        const canvas = document.getElementById('jungleSandbox');
+        const ctx = canvas.getContext('2d');
+        let monkeys = [], bananas = [];
+        const MAX_MONKEYS = 12;
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Banana {
+            constructor(x, y) { this.x = x; this.y = y; this.radius = 8; this.vy = 0; this.gravity = 0.25; this.isEaten = false; }
+            update() { this.vy += this.gravity; this.y += this.vy; if (this.y > canvas.height + 20) this.isEaten = true; }
+            draw() {
+                ctx.save(); ctx.translate(this.x, this.y); ctx.rotate(Math.PI / 6);
+                ctx.beginPath(); ctx.arc(0, 0, 12, 0, Math.PI * 0.7);
+                ctx.strokeStyle = '#eab308'; ctx.lineWidth = 6; ctx.lineCap = 'round'; ctx.stroke();
+                ctx.restore();
+            }
+        }
+
+        class Monkey {
+            constructor(anchorX, vineLength, monkeySize = 16) {
+                this.anchorX = anchorX; this.anchorY = 0; this.length = vineLength; this.size = monkeySize;
+                this.angle = (Math.random() - 0.5) * 0.8; this.angularVelocity = (Math.random() - 0.5) * 0.05;
+                this.angularAcceleration = 0; this.gravity = 0.35; this.bananasEaten = 0; this.x = 0; this.y = 0; this.legSway = 0;
+                this.hue = Math.floor(Math.random() * 360); this.furColor = `hsl(${this.hue}, 85%, 45%)`;
+            }
+            update() {
+                this.x = this.anchorX + Math.sin(this.angle) * this.length;
+                this.y = this.anchorY + Math.cos(this.angle) * this.length;
+                this.angularAcceleration = (-1 * this.gravity / this.length) * Math.sin(this.angle);
+                if (bananas.length > 0) {
+                    bananas.forEach(b => {
+                        if (Math.hypot(b.x - this.x, b.y - this.y) < this.size * 2 + b.radius + 10) { b.isEaten = true; this.eat(); }
+                    });
+                }
+                this.angularVelocity += this.angularAcceleration; this.angularVelocity *= 0.995; this.angle += this.angularVelocity;
+                this.legSway = -this.angle - (this.angularVelocity * 8);
+            }
+            eat() {
+                this.bananasEaten++; this.size += 2;
+                if (this.bananasEaten >= 3) {
+                    this.bananasEaten = 0; this.size = Math.max(14, this.size - 5);
+                    let babyAnchor = Math.max(40, Math.min(canvas.width - 40, this.anchorX + (Math.random() - 0.5) * 180));
+                    monkeys.push(new Monkey(babyAnchor, canvas.height * 0.65, 10));
+                    if (monkeys.length > MAX_MONKEYS) monkeys.shift();
+                }
+            }
+            draw() {
+                ctx.beginPath(); ctx.moveTo(this.anchorX, this.anchorY); ctx.lineTo(this.x, this.y);
+                ctx.strokeStyle = '#059669'; ctx.lineWidth = Math.max(2, this.size * 0.15); ctx.stroke();
+                for (let i = 1; i < 5; i++) {
+                    let t = i / 5, lx = this.anchorX + (this.x - this.anchorX) * t, ly = this.anchorY + (this.y - this.anchorY) * t;
+                    ctx.save(); ctx.translate(lx, ly); ctx.rotate(this.angle + (i % 2 === 0 ? 0.6 : -0.6));
+                    ctx.beginPath(); ctx.ellipse(0, 0, 8, 4, 0, 0, Math.PI * 2); ctx.fillStyle = '#10b981'; ctx.fill();
+                    ctx.strokeStyle = '#047857'; ctx.lineWidth = 1; ctx.stroke(); ctx.restore();
+                }
+                ctx.save(); ctx.translate(this.x, this.y); ctx.rotate(-this.angle);
+                const s = this.size;
+                ctx.beginPath(); ctx.moveTo(-s * 0.4, s * 0.4); ctx.quadraticCurveTo(-s * 0.6, -s * 0.8, -s * 0.15, -s * 1.3);
+                ctx.moveTo(s * 0.4, s * 0.4); ctx.quadraticCurveTo(s * 0.6, -s * 0.8, s * 0.15, -s * 1.3);
+                ctx.strokeStyle = this.furColor; ctx.lineWidth = s * 0.32; ctx.lineCap = 'round'; ctx.stroke();
+                ctx.beginPath(); ctx.arc(-s * 0.15, -s * 1.3, s * 0.2, 0, Math.PI * 2); ctx.arc(s * 0.15, -s * 1.3, s * 0.2, 0, Math.PI * 2); ctx.fillStyle = '#fbcfe8'; ctx.fill();
+                ctx.beginPath(); ctx.arc(-s * 0.6, s * 0.6, s * 0.8, Math.PI * 1.3, Math.PI * 0.3); ctx.strokeStyle = this.furColor; ctx.lineWidth = s * 0.25; ctx.stroke();
+                ctx.save(); ctx.translate(0, s * 1.1); ctx.rotate(this.legSway);
+                ctx.beginPath(); ctx.rect(-s * 0.4, 0, s * 0.25, s * 0.8); ctx.arc(-s * 0.3, s * 0.8, s * 0.2, 0, Math.PI * 2);
+                ctx.rect(s * 0.15, 0, s * 0.25, s * 0.8); ctx.arc(s * 0.25, s * 0.8, s * 0.2, 0, Math.PI * 2); ctx.fillStyle = this.furColor; ctx.fill(); ctx.restore();
+                ctx.beginPath(); ctx.ellipse(0, s * 0.6, s * 0.8, s * 0.7, 0, 0, Math.PI * 2); ctx.fillStyle = this.furColor; ctx.fill();
+                ctx.beginPath(); ctx.ellipse(0, s * 0.6, s * 0.5, s * 0.4, 0, 0, Math.PI * 2); ctx.fillStyle = '#fbcfe8'; ctx.fill();
+                ctx.beginPath(); ctx.arc(-s * 0.9, -s * 0.2, s * 0.4, 0, Math.PI * 2); ctx.arc(s * 0.9, -s * 0.2, s * 0.4, 0, Math.PI * 2); ctx.fillStyle = this.furColor; ctx.fill();
+                ctx.beginPath(); ctx.arc(0, -s * 0.3, s * 0.9, 0, Math.PI * 2); ctx.fillStyle = this.furColor; ctx.fill();
+                ctx.beginPath(); ctx.arc(-s * 0.25, -s * 0.2, s * 0.45, 0, Math.PI * 2); ctx.arc(s * 0.25, -s * 0.2, s * 0.45, 0, Math.PI * 2); ctx.fillStyle = '#fbcfe8'; ctx.fill();
+                ctx.beginPath(); ctx.arc(0, -s * 0.05, s * 0.45, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(-s * 0.25, -s * 0.3, s * 0.12, 0, Math.PI * 2); ctx.arc(s * 0.25, -s * 0.3, s * 0.12, 0, Math.PI * 2); ctx.fillStyle = '#0f172a'; ctx.fill();
+                ctx.beginPath(); ctx.arc(0, -s * 0.1, s * 0.22, 0, Math.PI); ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 1.5; ctx.stroke();
+                ctx.restore();
+            }
+        }
+
+        function triggerSpawn(x, y) { bananas.push(new Banana(x, y)); }
+
+        monkeys.push(new Monkey(window.innerWidth * 0.25, window.innerHeight * 0.60, 18));
+        monkeys.push(new Monkey(window.innerWidth * 0.50, window.innerHeight * 0.65, 22));
+        monkeys.push(new Monkey(window.innerWidth * 0.75, window.innerHeight * 0.55, 16));
+
+        window.addEventListener('mousedown', (e) => triggerSpawn(e.clientX, e.clientY));
+        window.addEventListener('touchstart', (e) => {
+            if (e.touches && e.touches.length > 0) {
+                triggerSpawn(e.touches[0].clientX, e.touches[0].clientY);
+            }
+        });
+
+        function engineLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            bananas = bananas.filter(b => !b.isEaten);
+            bananas.forEach(b => { b.update(); b.draw(); });
+            monkeys.forEach(m => { m.update(); m.draw(); });
+            requestAnimationFrame(engineLoop);
+        }
+        engineLoop();
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rubber Ducky Ecosystem Sandbox</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: linear-gradient(to bottom, #f0fdf4, #dcfce7);
+            font-family: system-ui, -apple-system, sans-serif;
+            user-select: none;
+            touch-action: none;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .ui-overlay {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #166534;
+            text-align: center;
+            pointer-events: none;
+            font-weight: bold;
+            font-size: 16px;
+            text-shadow: 0 1px 2px rgba(255,255,255,0.8);
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ui-overlay">Tap the Pond to Drop Bread Food! 🍞🌾</div>
+    <canvas id="ecoSandbox"></canvas>
+
+    <script>
+        const canvas = document.getElementById('ecoSandbox');
+        const ctx = canvas.getContext('2d');
+
+        let ducks = [];
+        let foodList = [];
+        let waterLevel = 0;
+        let waveOffset = 0;
+        
+        const POPULATION_CAP = 5;
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            waterLevel = canvas.height * 0.65;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Food {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.radius = 6;
+                this.vy = 0;
+                this.gravity = 0.2;
+                this.isEaten = false;
+            }
+            update() {
+                this.vy += this.gravity;
+                const currentWaterY = waterLevel + Math.sin((this.x * 0.015) + waveOffset) * 15;
+                
+                if (this.y > currentWaterY) {
+                    this.vy -= 0.25;
+                    this.vy *= 0.85;
+                    this.y += this.vy;
+                } else {
+                    this.y += this.vy;
+                }
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = '#b45309';
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius - 1.5, 0, Math.PI * 2);
+                ctx.fillStyle = '#fde68a';
+                ctx.fill();
+            }
+        }
+
+        class Ducky {
+            constructor(x, y, radius = 16) {
+                this.x = x;
+                this.y = y;
+                this.radius = radius; 
+                this.vx = (Math.random() - 0.5) * 4;
+                this.vy = 0;
+                this.gravity = 0.35;
+                this.bounce = 0.6;
+                this.angle = 0;
+                this.va = 0;
+            }
+
+            update() {
+                this.vy += this.gravity;
+                const currentWaterY = waterLevel + Math.sin((this.x * 0.015) + waveOffset) * 15;
+
+                if (this.y + this.radius > currentWaterY) {
+                    const depth = (this.y + this.radius) - currentWaterY;
+                    this.vy -= depth * 0.035;
+                    this.vy *= 0.85;
+                    
+                    if (foodList.length > 0) {
+                        let closestFood = foodList[0];
+                        let minDist = Infinity;
+                        foodList.forEach(f => {
+                            let dist = Math.hypot(f.x - this.x, f.y - this.y);
+                            if (dist < minDist) {
+                                minDist = dist;
+                                closestFood = f;
+                            }
+                        });
+
+                        if (closestFood.x > this.x) this.vx += 0.15;
+                        else this.vx -= 0.15;
+                        
+                        if (minDist < this.radius + closestFood.radius) {
+                            closestFood.isEaten = true;
+                            this.grow();
+                        }
+                    } else {
+                        this.vx += (Math.random() - 0.5) * 0.05;
+                    }
+
+                    this.vx *= 0.95;
+                    this.va += (this.vx * 0.01 - this.angle) * 0.1;
+                } else {
+                    this.va *= 0.98;
+                }
+
+                this.x += this.vx;
+                this.y += this.vy;
+                this.angle += this.va;
+                this.va *= 0.92;
+
+                if (this.x - this.radius < 0) { this.x = this.radius; this.vx *= -this.bounce; }
+                if (this.x + this.radius > canvas.width) { this.x = canvas.width - this.radius; this.vx *= -this.bounce; }
+                if (this.y + this.radius > canvas.height) { this.y = canvas.height - this.radius; this.vy *= -this.bounce; }
+            }
+
+            grow() {
+                this.radius += 3;
+                if (this.radius >= 42) {
+                    this.radius = 22;
+                    spawnBaby(this.x, this.y - 10);
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle);
+
+                const scale = this.radius / 20;
+
+                ctx.beginPath();
+                ctx.ellipse(0, 4 * scale, 18 * scale, 13 * scale, 0, 0, Math.PI * 2);
+                ctx.fillStyle = '#facc15';
+                ctx.fill();
+                ctx.strokeStyle = '#ca8a04';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.ellipse(-10 * scale, -2 * scale, 6 * scale, 8 * scale, Math.PI / 4, 0, Math.PI * 2);
+                ctx.fillStyle = '#facc15';
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.arc(10 * scale, -8 * scale, 9 * scale, 0, Math.PI * 2);
+                ctx.fillStyle = '#facc15';
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.ellipse(18 * scale, -8 * scale, 6 * scale, 3 * scale, 0, 0, Math.PI * 2);
+                ctx.fillStyle = '#f97316';
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.arc(11 * scale, -10 * scale, 1.5 * scale, 0, Math.PI * 2);
+                ctx.fillStyle = '#0f172a';
+                ctx.fill();
+
+                ctx.restore();
+            }
+        }
+
+        function checkCollisions() {
+            for (let i = 0; i < ducks.length; i++) {
+                for (let j = i + 1; j < ducks.length; j++) {
+                    let d1 = ducks[i];
+                    let d2 = ducks[j];
+                    let dx = d2.x - d1.x;
+                    let dy = d2.y - d1.y;
+                    let distance = Math.hypot(dx, dy);
+                    let minDist = d1.radius + d2.radius;
+
+                    if (distance < minDist) {
+                        let overlap = minDist - distance;
+                        let nx = dx / distance;
+                        let ny = dy / distance;
+                        d1.x -= nx * overlap * 0.5;
+                        d1.y -= ny * overlap * 0.5;
+                        d2.x += nx * overlap * 0.5;
+                        d2.y += ny * overlap * 0.5;
+                    }
+                }
+            }
+        }
+
+        function spawnBaby(x, y) {
+            ducks.push(new Ducky(x, y, 10));
+            if (ducks.length > POPULATION_CAP) {
+                ducks.shift();
+            }
+        }
+
+        function dropFood(clientX, clientY) {
+            foodList.push(new Food(clientX, clientY));
+        }
+
+        ducks.push(new Ducky(window.innerWidth * 0.25, window.innerHeight * 0.4, 20));
+        ducks.push(new Ducky(window.innerWidth * 0.50, window.innerHeight * 0.4, 20));
+        ducks.push(new Ducky(window.innerWidth * 0.75, window.innerHeight * 0.4, 20));
+
+        window.addEventListener('mousedown', (e) => dropFood(e.clientX, e.clientY));
+        window.addEventListener('touchstart', (e) => {
+            if (e.touches && e.touches.length > 0) {
+                dropFood(e.touches[0].clientX, e.touches[0].clientY);
+            }
+        });
+
+        function loop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            waveOffset += 0.03;
+
+            foodList = foodList.filter(f => !f.isEaten);
+            foodList.forEach(f => { f.update(); f.draw(); });
+
+            checkCollisions();
+
+            ducks.forEach(duck => {
+                duck.update();
+                duck.draw();
+            });
+
+            ctx.beginPath();
+            ctx.moveTo(0, canvas.height);
+            ctx.lineTo(0, waterLevel);
+            for (let x = 0; x <= canvas.width; x += 10) {
+                const y = waterLevel + Math.sin((x * 0.015) + waveOffset) * 15;
+                ctx.lineTo(x, y);
+            }
+            ctx.lineTo(canvas.width, canvas.height);
+            ctx.closePath();
+            ctx.fillStyle = 'rgba(56, 189, 248, 0.55)'; 
+            ctx.fill();
+
+            requestAnimationFrame(loop);
+        }
+
+        loop();
+    </script>
+</body>
+</html>
+

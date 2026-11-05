@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Spooky Treats Catcher</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom, #0c0014, #19012a, #2c0c4d);
+            overflow: hidden;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
+        }
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+        #moon {
+            position: absolute;
+            top: 40px;
+            right: 40px;
+            font-size: 100px;
+            filter: drop-shadow(0 0 25px rgba(255, 235, 59, 0.5));
+            z-index: 1;
+            pointer-events: none;
+        }
+        .bat {
+            position: absolute;
+            font-size: 40px;
+            z-index: 2;
+            pointer-events: none;
+            animation: flyAcross 14s linear infinite;
+        }
+        .house {
+            position: absolute;
+            bottom: 60px;
+            font-size: 160px;
+            opacity: 0.25;
+            z-index: 2;
+            pointer-events: none;
+        }
+        .cat {
+            position: absolute;
+            bottom: 65px;
+            font-size: 45px;
+            opacity: 0.8;
+            z-index: 3;
+            pointer-events: none;
+            animation: walkAround 18s ease-in-out infinite;
+        }
+        @keyframes flyAcross {
+            0% { left: -60px; transform: translateY(0px); }
+            50% { transform: translateY(-30px); }
+            100% { left: 105vw; transform: translateY(0px); }
+        }
+        @keyframes walkAround {
+            0% { left: -50px; transform: scaleX(1); }
+            45% { left: 45vw; transform: scaleX(1); }
+            50% { transform: scaleX(-1); }
+            95% { left: -40px; transform: scaleX(-1); }
+            100% { left: -50px; transform: scaleX(1); }
+        }
+        @keyframes walkAroundRight {
+            0% { right: -50px; transform: scaleX(-1); }
+            45% { right: 45vw; transform: scaleX(-1); }
+            50% { transform: scaleX(1); }
+            95% { right: -40px; transform: scaleX(1); }
+            100% { right: -50px; transform: scaleX(-1); }
+        }
+        #ground {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 70px;
+            background: #0d0614;
+            border-top: 4px solid #1f112e;
+            z-index: 4;
+        }
+        #player {
+            position: absolute;
+            bottom: 65px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90px;
+            height: 120px;
+            z-index: 5;
+            transition: left 0.1s ease-out;
+            pointer-events: none;
+        }
+        .kid-head {
+            position: absolute;
+            top: 0;
+            left: 20px;
+            width: 50px;
+            height: 50px;
+            background: #ffcc99;
+            border-radius: 50%;
+            box-shadow: inset -4px -4px 0 rgba(0,0,0,0.1);
+        }
+        .kid-head::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -3px;
+            width: 56px;
+            height: 25px;
+            background: #ff6d00;
+            border-radius: 30px 30px 0 0;
+        }
+        .kid-head::after {
+            content: '• •';
+            position: absolute;
+            top: 18px;
+            left: 14px;
+            font-size: 20px;
+            color: #263238;
+            letter-spacing: 4px;
+        }
+        .kid-body {
+            position: absolute;
+            top: 48px;
+            left: 25px;
+            width: 40px;
+            height: 50px;
+            background: #2979ff;
+            border-radius: 10px 10px 0 0;
+        }
+        .kid-arm-left {
+            position: absolute;
+            top: 52px;
+            left: 3px;
+            width: 26px;
+            height: 14px;
+            background: #ffcc99;
+            border-radius: 10px;
+            transform: rotate(-15deg);
+        }
+        .candy-bag {
+            position: absolute;
+            top: 40px;
+            left: -20px;
+            width: 38px;
+            height: 42px;
+            background: #ffab40;
+            border-radius: 5px 5px 15px 15px;
+            border: 2px solid #e65100;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .candy-bag::before {
+            content: '';
+            position: absolute;
+            top: -12px;
+            left: 8px;
+            width: 18px;
+            height: 12px;
+            border: 3px solid #e65100;
+            border-bottom: none;
+            border-radius: 10px 10px 0 0;
+        }
+        .candy-bag::after {
+            content: '▲ ▲';
+            position: absolute;
+            top: 8px;
+            left: 5px;
+            font-size: 11px;
+            color: #3e2723;
+            font-weight: bold;
+        }
+        .kid-legs {
+            position: absolute;
+            top: 98px;
+            left: 30px;
+            width: 30px;
+            height: 15px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .leg {
+            width: 12px;
+            height: 100%;
+            background: #37474f;
+            border-radius: 0 0 4px 4px;
+        }
+        .treat {
+            position: absolute;
+            font-size: 45px;
+            z-index: 5;
+        }
+        #ui-bar {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            gap: 20px;
+            z-index: 10;
+            pointer-events: none;
+        }
+        .hud-item {
+            font-size: 28px;
+            color: #ff9100;
+            font-weight: bold;
+            text-shadow: 2px 2px 0px #000;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 5px 15px;
+            border-radius: 15px;
+            border: 2px solid #ff9100;
+        }
+        #music-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.6);
+            border: 2px solid #ff9100;
+            color: #ff9100;
+            border-radius: 50%;
+            width: 55px;
+            height: 55px;
+            font-size: 26px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+
+    <button id="music-btn">🔇</button>
+
+    <div id="game-container">
+        <div id="moon">🌕</div>
+        <div class="bat" style="top: 8%; animation-delay: 0s;">🦇</div>
+        <div class="bat" style="top: 22%; animation-delay: 5s; animation-duration: 10s;">🦇</div>
+        
+        <div class="house" style="left: -2%;">🏡</div>
+        <div class="house" style="left: 32%;">🏚️</div>
+        <div class="house" style="left: 68%;">🏡</div>
+        
+        <div class="cat" style="animation-name: walkAround;">🐈‍⬛</div>
+        <div class="cat" style="animation-name: walkAroundRight; animation-delay: 4s;">🐈‍⬛</div>
+
+        <div id="ui-bar">
+            <div class="hud-item">🎃 Bag Candy: <span id="score">0</span></div>
+        </div>
+
+        <div id="player">
+            <div class="candy-bag"></div>
+            <div class="kid-arm-left"></div>
+            <div class="kid-head"></div>
+            <div class="kid-body"></div>
+            <div class="kid-legs">
+                <div class="leg"></div>
+                <div class="leg"></div>
+            </div>
+        </div>
+        
+        <div id="ground"></div>
+    </div>
+    <script>
+        let audioCtx = null;
+        let isMusicPlaying = false;
+        let musicInterval = null;
+        let beatCounter = 0;
+        let score = 0;
+
+        const container = document.getElementById('game-container');
+        const player = document.getElementById('player');
+        const scoreDisplay = document.getElementById('score');
+        const musicBtn = document.getElementById('music-btn');
+        const treatsPool = ['🍬', '🍭', '🍫', '🍿', '🧁', '🍩'];
+        let playerX = window.innerWidth / 2;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                startBackgroundMusic();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playSynthTone(freq, type, duration, volume) {
+            if (!audioCtx || !isMusicPlaying) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function startBackgroundMusic() {
+            musicInterval = setInterval(() => {
+                if (!isMusicPlaying) return;
+                let step = beatCounter % 4;
+                if (step === 0) playSynthTone(146.83, 'triangle', 0.6, 0.2); 
+                if (step === 2) playSynthTone(164.81, 'triangle', 0.6, 0.2); 
+                if (step === 0) playSynthTone(293.66, 'sine', 0.3, 0.1); 
+                if (step === 1) playSynthTone(329.63, 'sine', 0.3, 0.1); 
+                if (step === 2) playSynthTone(392.00, 'sine', 0.3, 0.1); 
+                if (step === 3) playSynthTone(440.00, 'sine', 0.2, 0.1); 
+                beatCounter++;
+            }, 400);
+        }
+
+        function playCatchSound() {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); 
+            osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.1); 
+            gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.1);
+        }
+
+        function movePlayer(clientX) {
+            playerX = clientX;
+            if (playerX < 60) playerX = 60;
+            if (playerX > window.innerWidth - 60) playerX = window.innerWidth - 60;
+            player.style.left = playerX + 'px';
+        }
+
+        window.addEventListener('mousemove', (e) => movePlayer(e.clientX));
+        window.addEventListener('touchmove', (e) => {
+            if (e.touches && e.touches[0]) movePlayer(e.touches[0].clientX);
+        }, { passive: true });
+        window.addEventListener('touchstart', (e) => {
+            initAudio();
+            if (e.touches && e.touches[0]) movePlayer(e.touches[0].clientX);
+        }, { passive: true });
+
+        function spawnFallingTreat() {
+            const treat = document.createElement('div');
+            treat.className = 'treat';
+            treat.textContent = treatsPool[Math.floor(Math.random() * treatsPool.length)];
+            const startX = Math.random() * (window.innerWidth - 80) + 40;
+            treat.style.left = startX + 'px';
+            treat.style.top = '-50px';
+            container.appendChild(treat);
+
+            let currentY = -50;
+            const fallSpeed = 3 + Math.random() * 2;
+
+            const animationLoop = setInterval(() => {
+                currentY += fallSpeed;
+                treat.style.top = currentY + 'px';
+
+                const playerRect = player.getBoundingClientRect();
+                const treatRect = treat.getBoundingClientRect();
+
+                if (
+                    treatRect.bottom >= playerRect.top + 30 &&
+                    treatRect.top <= playerRect.bottom &&
+                    treatRect.right >= playerRect.left - 25 &&
+                    treatRect.left <= playerRect.left + 45
+                ) {
+                    clearInterval(animationLoop);
+                    treat.remove();
+                    score++;
+                    scoreDisplay.textContent = score;
+                    playCatchSound();
+                }
+
+                if (currentY > window.innerHeight - 100) {
+                    clearInterval(animationLoop);
+                    treat.remove();
+                }
+            }, 20);
+        }
+
+        musicBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            initAudio();
+            isMusicPlaying = !isMusicPlaying;
+            musicBtn.textContent = isMusicPlaying ? '🔊' : '🔇';
+        });
+
+        setInterval(spawnFallingTreat, 1600);
+    </script>
+</body>
+</html>
+
